@@ -1,0 +1,8 @@
+<div class="form-group{{#success}} has-feedback{{/success}}{{#error}} has-feedback has-error{{/error}}">
+	{{CONTENTS}}
+	{{#success}}<span class="glyphicon glyphicon-ok form-control-feedback"></span>{{/success}}
+	{{#error}}
+		<span class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
+		<p class="text-danger">{{error}}</p>
+	{{/error}}
+</div>

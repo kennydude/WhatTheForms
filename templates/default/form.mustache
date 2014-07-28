@@ -1,0 +1,14 @@
+<form method="post" role="form" action="{{ action }}" class="whattheforms">
+
+{{# has_errors }}
+	<div class="error message">
+		The form contains errors, please correct them before continuing
+	</div>
+{{/has_errors}}
+
+{{# fields }}
+	<div id="wrap-{{id}}">{{& value }}</div>
+{{/fields}}
+
+{{& footer }}
+</form>
