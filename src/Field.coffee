@@ -1,4 +1,5 @@
 WhatTheClass = require("./WhatTheClass").WhatTheClass
+async = require("async")
 
 class @FormElement extends WhatTheClass
 	@property "id"
@@ -12,8 +13,8 @@ class @FormElement extends WhatTheClass
 	# DO NOT IMPLEMENT YOURSELF
 	do_validation : (req, cb) ->
 		@run_validation req, (err) =>
-			@error = err
-			cb err
+			@error = err || null
+			cb err || null
 
 	run_validation: (req, fn) ->
 		console.log "WARN: run_validation() method is not implemented!"
@@ -31,11 +32,13 @@ class @Field extends @FormElement
 	validate : (validation, errMsg) ->
 		if !@validators
 			@validators = []
+		if !errMsg
+			errMsg = "Not a valid value"
 
 		# What kind of validator are we dealing with
 		if validation instanceof RegExp
 			@validators.push (value, next) ->
-				if validation.test value
+				if validation.test(value) == true
 					next(null) # No Error
 				else
 					next(errMsg)
@@ -43,6 +46,26 @@ class @Field extends @FormElement
 			@validators.push validation # push function directly!
 
 		return @
+
+	run_validation: (req, fn) ->
+		# Validation for fields
+		val = req.body[ @name() ]
+		delete req.body[ @name() ] # Remove it!
+		error = []
+
+		if !@validators
+			@validators = []
+
+		async.each @validators, (validator, n) ->
+			validator val, (err) ->
+				if err
+					error.push err
+				n()
+		, () ->
+			error = error.join("\n")
+			if error == ""
+				error = null
+			fn error
 
 
 class @BasicField extends @Field

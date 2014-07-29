@@ -48,14 +48,15 @@ class @Form extends WhatTheClass
 
 				errors = []
 				console.log @items
+
 				async.each @items, (item, cb) ->
 					console.log "VALIDATE ITEM"
 					item.do_validation req, (err) ->
-						if(err != null)
+						if(err)
 							errors.push err
 						cb(null)
 				, () ->
-					console.log "OK"
+					console.log "OK", errors
 					if errors.length == 0
 						return process_func(req, res)
 

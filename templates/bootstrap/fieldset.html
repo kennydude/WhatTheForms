@@ -1,0 +1,6 @@
+<fieldset>
+	{% if label %}<legend><h3>{{label}}</h3></legend>{% endif %}
+	{% for value in fields %}
+		<div id="wrap-{{value.id}}">{{value.value|raw}}</div>
+	{% endfor %}
+</fieldset>

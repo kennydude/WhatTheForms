@@ -10,36 +10,20 @@ class FormRenderer
 
 ent = require("ent")
 fs = require("fs")
-mustache = require("mustache")
-templateCache = {}
 
-findTemplate = (renderer, template_name) ->
-	filepaths = [
-		"templates/#{renderer}/#{template_name}.mustache",
-		"templates/default/#{template_name}.mustache"
-	]
-	for path in filepaths
-		try
-			return fs.readFileSync(path).toString()
-		catch
-	return null
+swig = require('swig')
+fallbackswigloader = require("fallbackswigloader")
+if process?.env?.DEBUG? # Turn off template cache when in debug mode!
+	swig.setDefaults({ cache: false })
 
-# DO NOT USE!!
-bakeTemplate = (renderer, template_name) ->
-	file = findTemplate(renderer, template_name)
-	if file.indexOf("@extends") == 0
-		# This template inherits from another
-		line = file.split("\n")[0]
-		ext = line.substr( "@extends ".length )
-		file = file.substr( line.length )
-		file = bakeTemplate(renderer, ext).replace("{{CONTENTS}}", file)
-	return file
-
-# Use me! :D
-renderMustache = (renderer, template_name, data) ->
-	if template_name not in templateCache
-		templateCache[template_name] = bakeTemplate(renderer, template_name)
-	return mustache.render( templateCache[template_name], data )
+renderTemplate = (renderer, template_name, data) ->
+	swig.setDefaults {
+		loader : fallbackswigloader([
+			"templates/#{renderer}",
+			"templates/default"
+		])
+	}
+	return swig.renderFile("#{template_name}.html", data)
 
 class BasicFormRenderer extends FormRenderer
 	render: (form) ->
@@ -58,22 +42,22 @@ class BasicFormRenderer extends FormRenderer
 				vend.data.fields = []
 				for field in vend.fields
 					vend.data.fields.push {
-						"id" : field.id,
-						"value" : renderMustache(@format, field.type, field.data)
+						"id" : field.id.toString(),
+						"value" : renderTemplate(@format, field.type, field.data)
 					}
 					fldId++
 
 			o.push {
-				"id" : item.id
-				"value" : renderMustache(@format, vend.type, vend.data)
+				"id" : item.id()
+				"value" : renderTemplate(@format, vend.type, vend.data)
 			}
 			fldId++
 
 
 		footer = form.footer().render()
-		footer = renderMustache(@format, "footer_#{footer.type}", footer.data)
+		footer = renderTemplate(@format, "footer_#{footer.type}", footer.data)
 
-		o = renderMustache(@format, "form", {
+		o = renderTemplate(@format, "form", {
 			"fields" : o,
 			"action" : action,
 			"footer" : footer

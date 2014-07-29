@@ -34,4 +34,4 @@ class @Fieldset extends FormElement
 					errors = true
 				next()
 		, () ->
-			fn( errors ? "InternalFieldsetError" : null )
+			fn( errors == true ? "InternalFieldsetError" : null )

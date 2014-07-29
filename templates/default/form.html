@@ -1,14 +1,14 @@
 <form method="post" role="form" action="{{ action }}" class="whattheforms">
 
-{{# has_errors }}
+{% if has_errors %}
 	<div class="error message">
 		The form contains errors, please correct them before continuing
 	</div>
-{{/has_errors}}
+{% endif %}
 
-{{# fields }}
-	<div id="wrap-{{id}}">{{& value }}</div>
-{{/fields}}
+{% for value in fields %}
+	<div id="wrap-{{ value.id }}">{{ value.value | raw }}</div>
+{% endfor %}
 
-{{& footer }}
+{{ footer | raw }}
 </form>

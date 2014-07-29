@@ -1,4 +1,5 @@
 # Basic "does it work" tests
+process.env['DEBUG'] = true
 
 WhatTheForms = require("../src/WhatTheForms.coffee")
 
