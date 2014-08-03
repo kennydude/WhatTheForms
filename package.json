@@ -8,7 +8,10 @@
     "swig": "^1.4.1"
   },
   "devDependencies": {
+    "body-parser": "^1.5.2",
     "express": "*",
-    "body-parser": "^1.5.2"
+    "gulp": "^3.8.7",
+    "gulp-coffee": "^2.1.1",
+    "gulp-replace": "^0.4.0"
   }
 }

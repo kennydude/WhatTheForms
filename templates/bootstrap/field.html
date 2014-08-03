@@ -1,6 +1,6 @@
 <div class="form-group{% if success %} has-feedback{% endif %}{% if error %} has-feedback has-error{% endif %}">
 	{% block contents %}TODO{% endblock %}
-	{% if success %}<span class="glyphicon glyphicon-ok form-control-feedback"></span>{% endif %}
+	{% if !error && client %}<span class="glyphicon glyphicon-ok form-control-feedback"></span>{% endif %}
 
 	{% if error %}
 		<span class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>

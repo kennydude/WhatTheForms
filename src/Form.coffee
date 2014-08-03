@@ -31,15 +31,10 @@ class @Form extends WhatTheClass
 
 			if req.method == "GET"
 				if req.query['request'] == "whattheforms"
-					# Return view information for validation
-					o = { "status" : "ok", "result" : {} }
-
-					for item in @items
-						o.result[item._name] = {
-							"validators" : validator.toString() for validator in (item.validators || [])
-						}
-
-					res.json(o)
+					if req.query['cmd'] == "js" # This is generally for testing
+						res.type("js").end( @script( req.query['format'] || "bootstrap" ) )
+					else
+						return res.error 404, "WhatTheForms Method is not available"
 				else
 					return view_func(req, res)
 			else if req.method == "POST"
@@ -87,8 +82,13 @@ class @Form extends WhatTheClass
     @param format {str} Template set to use
 	###
 	script : (format) ->
-		templatesRequired = []
-
-
-
-		return ''
+		# Only include form renders code path if required
+		FormRenderers = require("./FormRenderer").renderers
+		if typeof format == "string"
+			if FormRenderers[format]
+				r = new FormRenderers[format]()
+				return r.script(@)
+			else
+				throw new Error("Form renderer could not be found")
+		else
+			return format.script(@)

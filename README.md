@@ -6,6 +6,11 @@ Forms can be a tricky business, so we're here to help!
 
 VERY EARLY ALPHA STAGE!!!!!
 
+The name for this library is based on the inspiration for this library, [WTForms](http://wtforms.readthedocs.org/en/latest/)
+which is written for Python.
+
+To use the development version, you need to run `make` to build a few things that are required
+
 ## Express
 
 WhatTheForms works with Express, a quick guide of what you need to do:

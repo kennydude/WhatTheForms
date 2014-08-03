@@ -48,6 +48,7 @@ app.all "/form", form.controller(
 <div class="container">
 	#{frm}
 </div>
+<script type="text/javascript" src="/form?request=whattheforms&cmd=js"></script>
 </body>
 </html>
 """

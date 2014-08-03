@@ -20,6 +20,17 @@ class @FormElement extends WhatTheClass
 		console.log "WARN: run_validation() method is not implemented!"
 		fn( new Error("run_validation() method is not implemented") )
 
+	clientGo : (@element) ->
+		throw new Error("clientGo() method is not implemented")
+
+	typeName : () ->
+		throw new Error("typeName() method is not implemented")
+
+	script : () ->
+		throw new Error("script() method is not implemented")
+
+	extraProps : () -> # Do nothing
+
 class @Field extends @FormElement
 	# Properties
 	@property "name"
@@ -37,11 +48,10 @@ class @Field extends @FormElement
 
 		# What kind of validator are we dealing with
 		if validation instanceof RegExp
-			@validators.push (value, next) ->
-				if validation.test(value) == true
-					next(null) # No Error
-				else
-					next(errMsg)
+			@validators.push new Function("value", "next", """
+if( #{validation}.test( value ) == true) next(null);
+else{ next("#{errMsg}"); }
+""");
 		else if typeof validation == "function"
 			@validators.push validation # push function directly!
 
@@ -67,6 +77,25 @@ class @Field extends @FormElement
 				error = null
 			fn error
 
+	clientValidationValues : () ->
+		throw new Error("clientValidationValues() is not implemented")
+
+	clientRender : () ->
+		# Render itself
+		r = @render()
+		# Validation!
+		@do_validation {"body" : @clientValidationValues() }, (err) =>
+			r.data.error = err
+			r.data['client'] = 1
+
+			console.log r
+			@element.innerHTML = swig.run(templates[r.type], r.data)
+			@clientGo(@element)
+
+	extraProps : () ->
+		return {
+			"validators" : "[" + ("#{v}" for v in @validators).join(",") + "]"
+		}
 
 class @BasicField extends @Field
 	constructor: (@_type) ->
@@ -75,6 +104,7 @@ class @BasicField extends @Field
 	# Properties
 	@property "type"
 	@property "placeholder"
+	@property "value"
 
 	render : () ->
 		return {
@@ -85,10 +115,32 @@ class @BasicField extends @Field
 				"name" : @name(),
 				"placeholder" : @placeholder(),
 				"id" : @id() || @name(),
+				"value" : @value(),
 				"error" : @error
 			},
 			"id" : @id()
 		}
+
+	typeName : () ->
+		return "basic_field"
+
+	script : () ->
+		return { "require" : "Field", "class" : "BasicField" }
+
+	clientValidationValues : () ->
+		r = {}
+		r[@name()] = @value()
+		return r
+
+	clientGo : (@element) ->
+		@value = () -> # Override property
+			return @input.value
+
+		@input = @element.getElementsByTagName("input")[0]
+		@input.addEventListener "blur", () =>
+			@clientRender()
+
+		return @
 
 class @TextField extends @BasicField
 	constructor: () -> super "text"

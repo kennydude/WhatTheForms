@@ -19,7 +19,13 @@ class @WhatTheClass
 		@prototype._props.push name
 
 	properties : () ->
-		ret = {}
-		for prop in @_props
-			ret[prop] = @[prop]()
-		return ret
+		if arguments.length == 1
+			props = arguments[0]
+			for key, value of props
+				@[key](value)
+			return @
+		else
+			ret = {}
+			for prop in @_props
+				ret[prop] = @[prop]()
+			return ret
