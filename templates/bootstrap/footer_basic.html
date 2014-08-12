@@ -1,5 +1,3 @@
 <fieldset>
-	{% for button in buttons %}
-		<button class="btn btn-{{button.class}}" type="{{button.type}}">{{button.label}}</button>
-	{% endfor %}
+	<button data-repeat="buttons" data-attr='type: type' class="btn" data-text="label"></button>
 </fieldset>

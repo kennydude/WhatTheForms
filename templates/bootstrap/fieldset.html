@@ -1,6 +1,4 @@
 <fieldset>
-	{% if label %}<legend><h3>{{label}}</h3></legend>{% endif %}
-	{% for value in fields %}
-		<div id="wrap-{{value.id}}">{{value.value|raw}}</div>
-	{% endfor %}
+	<legend data-if="label"><h3 data-html="label"></h3></legend>
+	<div data-repeat="fields" data-attr='id: "wrap-" + id' data-html="value"></div>
 </fieldset>

@@ -1,14 +1,11 @@
-<form method="post" role="form" action="{{ action }}" class="whattheforms" id="{{ name }}">
+<form method="post" role="form" data-attr="action: action
+id: name" class="whattheforms">
 
-{% if has_errors %}
-	<div class="error message">
+<div data-if="has_errors" class="error message">
 		The form contains errors, please correct them before continuing
-	</div>
-{% endif %}
+</div>
 
-{% for value in fields %}
-	<div id="wrap-{{ value.id }}">{{ value.value | raw }}</div>
-{% endfor %}
+<div data-repeat="fields" data-html="value" data-attr='id: "wrap-" + id'>{{ value.value | raw }}</div>
 
-{{ footer | raw }}
+<div class="footer" data-html="footer"></div>
 </form>

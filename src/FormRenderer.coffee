@@ -12,6 +12,8 @@ ent = require("ent")
 fs = require("fs")
 path = require("path")
 
+# Goodbye SWIG
+'''
 swig = require("swig")
 fallbackswigloader = require("fallbackswigloader")
 if process?.env?.DEBUG? # Turn off template cache when in debug mode!
@@ -33,6 +35,25 @@ renderTemplate = (renderer, template_name, data) ->
 		])
 	}
 	return swig.renderFile("#{template_name}.html", data)
+'''
+# END SWIG
+
+templateCache = {}
+t5 = require "t5"
+
+renderTemplate = (renderer, template_name, data) ->
+	console.log template_name, data
+
+	if templateCache[template_name]
+		return templateCache[template_name].build()(ent, data)
+	tpl = t5.compileFile("#{template_name}.html", {
+		loader : new t5.T5FallbackFileTemplateLoader([
+			"templates/#{renderer}",
+			"templates/default"
+		])
+	})
+	templateCache[template_name] = tpl
+	return tpl.build()(ent, data)
 
 class BasicFormRenderer extends FormRenderer
 	script : (form) ->
@@ -53,7 +74,7 @@ class BasicFormRenderer extends FormRenderer
 				scrp = item.script()
 				if !(vend.type in templates)
 					console.log vend.type
-					templates[vend.type] = compileTemplate(@format, vend.type).tpl.toString().replace('anonymous', '')
+					#templates[vend.type] = compileTemplate(@format, vend.type).tpl.toString().replace('anonymous', '')
 
 					scrp = item.script()
 					o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", scrp['require'] + ".js") ).toString()
@@ -94,7 +115,7 @@ var form = {};
 
 				vend.data.fields = []
 				for field in vend.fields
-					vend.d8ata.fields.push {
+					vend.data.fields.push {
 						"id" : field.id.toString(),
 						"value" : renderTemplate(@format, field.type, field.data)
 					}

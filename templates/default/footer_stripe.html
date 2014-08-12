@@ -1,13 +1,11 @@
 <fieldset class="footer stripe">
 	<script
 		src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-		data-key="{{ stripeKey }}"
-		data-image="{{ image }}"
-		data-name="{{ title }}"
-		data-description="{{ description }}"
-		data-amount="{{ amount }}">
+		data-attr="data-key: stripeKey
+data-image: image
+data-name: title
+data-description: description
+data-amount: amount">
 	</script>
-	{{#testMode}}
-	<strong>Test Mode!</strong>
-	{{/testMode}}
+	<strong data-if="testMode">Test Mode!</strong>
 </fieldset>

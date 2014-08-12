@@ -1,9 +1,10 @@
-<div class="form-group{% if success %} has-feedback{% endif %}{% if error %} has-feedback has-error{% endif %}">
-	{% block contents %}TODO{% endblock %}
-	{% if !error && client %}<span class="glyphicon glyphicon-ok form-control-feedback"></span>{% endif %}
+<div data-class="has-feedback: !error && client
+has-feedback has-error: error" class="form-group">
+	<block id="contents">Field contents needs to be written :O</block>
+	<span data-if="!error && client" class="glyphicon glyphicon-ok form-control-feedback"></span>
 
-	{% if error %}
+	<div data-if="error">
 		<span class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
-		<p class="text-danger">{{error}}</p>
-	{% endif %}
+		<p data-html="error" class="text-danger"></p>
+	</div>
 </div>
