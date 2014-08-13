@@ -41,62 +41,59 @@ renderTemplate = (renderer, template_name, data) ->
 templateCache = {}
 t5 = require "t5"
 
-renderTemplate = (renderer, template_name, data) ->
+compileTemplate = (renderer, template_name) ->
 	if templateCache[template_name]
-		return templateCache[template_name].build()(ent, data)
+		return templateCache[template_name]
 	tpl = t5.compileFile("#{template_name}.html", {
 		loader : new t5.T5FallbackFileTemplateLoader([
 			"templates/#{renderer}",
 			"templates/default"
-		])
+		]),
+		name : "tpl_#{template_name}"
 	})
 	templateCache[template_name] = tpl
-	return tpl.build()(ent, data)
+	return tpl
+
+renderTemplate = (renderer, template_name, data) ->
+	return compileTemplate(renderer, template_name).build()(ent, data)
 
 class BasicFormRenderer extends FormRenderer
+	scriptField : (vend, item) ->
+		if !(vend.type in @templates)
+			console.log vend.type
+			@templates[vend.type] = true
+			@o += compileTemplate(@format, vend.type).manageClass
+
+			scrp = vend.script
+			@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", scrp['require'] + ".js") ).toString()
+
+		@o += """
+form["#{vend.id}"] = new #{scrp.class}().go(document.getElementById("wrap-#{vend.id}"), #{vend.client});
+"""
+
 	script : (form, result) ->
 		# Collect templates and other information
-		templates = {}
-		o = ''
+		@templates = {}
+		@o = ''
 
-		o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", "WhatTheClass.js") ).toString()
-		o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", "core.js") ).toString()
-		o += fs.readFileSync( path.join(__dirname, "..", "client", "miniswig.js") ).toString()
-		o += fs.readFileSync( path.join(__dirname, "..", "node_modules", "async", "lib", "async.js") ).toString()
+		@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", "WhatTheClass.js") ).toString()
+		@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", "core.js") ).toString()
+		@o += fs.readFileSync( path.join(__dirname, "..", "node_modules", "async", "lib", "async.js") ).toString()
 
 		for item in form.items
 			vend = item.render(@format)
 			if vend.type == "fieldset" # Special Case!
-				console.log "Fieldset is not supported just yet"
+				for f in vend.fields
+					@scriptField(f)
 			else
-				scrp = item.script()
-				if !(vend.type in templates)
-					console.log vend.type
-					#templates[vend.type] = compileTemplate(@format, vend.type).tpl.toString().replace('anonymous', '')
+				@scriptField(vend)
 
-					scrp = item.script()
-					o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", scrp['require'] + ".js") ).toString()
-
-				o += """
-form["#{item.id()}"] = new #{scrp.class}()
-						.properties(#{JSON.stringify(item.properties())})
-						.clientGo(document.getElementById("wrap-#{item.id()}"));
-"""
-				ex = item.extraProps()
-				for key, val of ex
-					o += """
-form["#{item.id()}"]["#{key}"] = #{val};
-"""
-
-		# Almost JSON, but it's actually just making a JS object!
-		templates = "{" + ("\"#{k}\" : #{v}" for k, v of templates).join(",") + "}"
-		o = """
-var templates = #{templates};
+		@o = """
 var form = {};
 
-#{o}
+#{@o}
 """
-		return o
+		return @o
 
 	render: (form, result) ->
 		action = ent.encode form.action()

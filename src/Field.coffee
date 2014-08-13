@@ -95,6 +95,11 @@ else{ next("#{errMsg}"); }
 		return {
 			"validators" : "[" + ("#{v}" for v in @validators).join(",") + "]"
 		}
+	client : () ->
+		validators = ("#{v}" for v in @validators).join(",")
+		return """{
+	"validators" : [ #{validators} ]
+}"""
 
 class @BasicField extends @Field
 	constructor: (@_type) ->
@@ -114,14 +119,16 @@ class @BasicField extends @Field
 				"placeholder" : @placeholder(),
 				"id" : @id() || @name()
 			},
-			"id" : @id()
+			"id" : @id() || @name(),
+			"client" : @client(),
+			"script" : @script()
 		}
 
 	typeName : () ->
 		return "basic_field"
 
 	script : () ->
-		return { "require" : "Field", "class" : "BasicField" }
+		return { "require" : "Field", "class" : "Field" }
 
 	clientValidationValues : () ->
 		r = {}
