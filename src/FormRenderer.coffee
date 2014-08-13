@@ -42,8 +42,6 @@ templateCache = {}
 t5 = require "t5"
 
 renderTemplate = (renderer, template_name, data) ->
-	console.log template_name, data
-
 	if templateCache[template_name]
 		return templateCache[template_name].build()(ent, data)
 	tpl = t5.compileFile("#{template_name}.html", {
@@ -56,7 +54,7 @@ renderTemplate = (renderer, template_name, data) ->
 	return tpl.build()(ent, data)
 
 class BasicFormRenderer extends FormRenderer
-	script : (form) ->
+	script : (form, result) ->
 		# Collect templates and other information
 		templates = {}
 		o = ''
@@ -100,7 +98,7 @@ var form = {};
 """
 		return o
 
-	render: (form) ->
+	render: (form, result) ->
 		action = ent.encode form.action()
 		o = []
 		fldId = 0
@@ -115,11 +113,17 @@ var form = {};
 
 				vend.data.fields = []
 				for field in vend.fields
+					field.data.error = result?.errors?[item.id()]?[field.id]
+					field.data.value = result?[item.id()]?[field.id]
 					vend.data.fields.push {
 						"id" : field.id.toString(),
 						"value" : renderTemplate(@format, field.type, field.data)
 					}
 					fldId++
+			else
+				# Add result
+				vend.data.error = result?.errors?[ item.id() ]
+				vend.data.value = result?[ item.id() ]
 
 			o.push {
 				"id" : item.id()

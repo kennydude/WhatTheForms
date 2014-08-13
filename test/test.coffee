@@ -8,7 +8,7 @@ form = new WhatTheForms.Form().action("/form")
 form.add( new WhatTheForms.BasicField().type("text").name("test1").label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g) )
 
 fieldset = new WhatTheForms.Fieldset().label("Bank details")
-fieldset.add( new WhatTheForms.TextField().name("test2").label("Testing").placeholder("OKFISH") )
+fieldset.add new WhatTheForms.TextField().name("test2").label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g) 
 
 form.add(fieldset)
 
@@ -37,7 +37,7 @@ app.use (req, res, next) ->
 
 app.all "/form", form.controller(
 	(req, res) ->
-		frm = form.render('bootstrap')
+		frm = form.render('bootstrap', req.body)
 		res.end """
 <html>
 <head>

@@ -27,11 +27,19 @@ class @Fieldset extends FormElement
 	# This is the 1 occasion where this is acceptable, because a grouping
 	# shouldn't have an error
 	do_validation: (req, fn) ->
-		errors = false
+		errors = {}
+		values = {}
+		hasErrors = false
+
 		async.each @items, (item, next) ->
-			item.do_validation req, (err) ->
+			item.do_validation req, (err, val) ->
 				if err
-					errors = true
+					errors[item.id()] = err
+					hasErrors = true
+				values[item.id()] = val
+				console.log item.id(), err, "ERRRRR"
 				next()
 		, () ->
-			fn( errors == true ? "InternalFieldsetError" : null )
+			if not hasErrors
+				errors = null
+			fn( errors, values )

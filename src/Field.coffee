@@ -12,13 +12,12 @@ class @FormElement extends WhatTheClass
 
 	# DO NOT IMPLEMENT YOURSELF
 	do_validation : (req, cb) ->
-		@run_validation req, (err) =>
-			@error = err || null
-			cb err || null
+		@run_validation req, (err, value) =>
+			cb err || null, value
 
 	run_validation: (req, fn) ->
 		console.log "WARN: run_validation() method is not implemented!"
-		fn( new Error("run_validation() method is not implemented") )
+		fn( new Error("run_validation() method is not implemented"), null )
 
 	clientGo : (@element) ->
 		throw new Error("clientGo() method is not implemented")
@@ -75,7 +74,7 @@ else{ next("#{errMsg}"); }
 			error = error.join("\n")
 			if error == ""
 				error = null
-			fn error
+			fn error, val
 
 	clientValidationValues : () ->
 		throw new Error("clientValidationValues() is not implemented")
@@ -104,7 +103,6 @@ class @BasicField extends @Field
 	# Properties
 	@property "type"
 	@property "placeholder"
-	@property "value"
 
 	render : () ->
 		return {
@@ -114,9 +112,7 @@ class @BasicField extends @Field
 				"label" : @label(),
 				"name" : @name(),
 				"placeholder" : @placeholder(),
-				"id" : @id() || @name(),
-				"value" : @value(),
-				"error" : @error
+				"id" : @id() || @name()
 			},
 			"id" : @id()
 		}

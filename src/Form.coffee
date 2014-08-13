@@ -41,18 +41,24 @@ class @Form extends WhatTheClass
 				if !req.body
 					return res.error 400, "POST Body not provided"
 
-				errors = []
+				errors = false
 				console.log @items
+				result = { "errors" : {} }
 
 				async.each @items, (item, cb) ->
 					console.log "VALIDATE ITEM"
-					item.do_validation req, (err) ->
+					item.do_validation req, (err, value) ->
 						if(err)
-							errors.push err
+							errors = true
+
+						result[item.id()] = value
+						result.errors[item.id()] = err
+
 						cb(null)
 				, () ->
 					console.log "OK", errors
-					if errors.length == 0
+					req.body = result
+					if not errors
 						return process_func(req, res)
 
 					req.has_errors = true
@@ -63,18 +69,19 @@ class @Form extends WhatTheClass
 	###
     Return the HTML of the form
     @param format {str} Template set to use
+	@param result {object} optional Result object
     ###
-	render: (format) ->
+	render: (format, result) ->
 		# Only include form renders code path if required
 		FormRenderers = require("./FormRenderer").renderers
 		if typeof format == "string"
 			if FormRenderers[format]
 				r = new FormRenderers[format]()
-				return r.render(@)
+				return r.render @, result
 			else
 				throw new Error("Form renderer could not be found")
 		else
-			return format.render(@)
+			return format.render @, result
 
 	###
     Return the Javascript required to make the form function correctly everywhere,
