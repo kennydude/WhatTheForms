@@ -3,16 +3,16 @@ class @Field extends @Box
 		val = @template.value
 		error = []
 
-		async.each @validators, (validator, n) ->
+		async.each @validators, (validator, n) =>
 			validator val, (err) ->
 				if err
 					error.push err
 				n()
+			, @id
 		, () =>
-			error = error.join("\n")
+			error = error.join("<br/>")
 			if error == ""
 				error = null
-			console.log error, @
 			@template.error = error
 
 	go: (wrap, data) ->
@@ -20,7 +20,13 @@ class @Field extends @Box
 		@template.client = true
 
 		@validators = data.validators
+		@id = data.id
+		@timer = null
 
 		@template.on "input-changed", () =>
-			@validate()
+			if @timer
+				clearTimeout @timer
+			@timer = setTimeout () =>
+				@validate()
+			, 500
 		return @

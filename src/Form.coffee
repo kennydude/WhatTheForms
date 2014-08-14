@@ -29,14 +29,27 @@ class @Form extends WhatTheClass
 		return (req, res) =>
 			req.form = @
 
-			if req.method == "GET"
-				if req.query['request'] == "whattheforms"
-					if req.query['cmd'] == "js" # This is generally for testing
+			if req.query['request'] == "whattheforms"
+				switch req.query['cmd']
+					when "js" # This is generally for testing
 						res.type("js").end( @script( req.query['format'] || "bootstrap" ) )
+					when "validate"
+						if !req.body['fieldid']
+							return res.error 400, "Field was required"
+						for item in @items
+							if item.id() == req.body.fieldid
+								item.do_validation req, (err) ->
+									return res.json {
+										"status" : "ok",
+										"error" : err
+									}
+								, true
+								return
+						return res.json {
+							"status" : "fail"
+						}
 					else
 						return res.error 404, "WhatTheForms Method is not available"
-				else
-					return view_func(req, res)
 			else if req.method == "POST"
 				if !req.body
 					return res.error 400, "POST Body not provided"
@@ -55,6 +68,7 @@ class @Form extends WhatTheClass
 						result.errors[item.id()] = err
 
 						cb(null)
+					, false
 				, () ->
 					console.log "OK", errors
 					req.body = result
@@ -63,6 +77,8 @@ class @Form extends WhatTheClass
 
 					req.has_errors = true
 					return view_func(req, res)
+			else if req.method == "GET"
+				return view_func(req, res)
 			else
 				res.error 404, "Unsupported Method"
 

@@ -11,16 +11,14 @@ class @FormElement extends WhatTheClass
 		throw new Error("render() method is not implemented")
 
 	# DO NOT IMPLEMENT YOURSELF
-	do_validation : (req, cb) ->
+	do_validation : (req, cb, server_only) ->
 		@run_validation req, (err, value) =>
-			cb err || null, value
+			cb err, value
+		, server_only
 
-	run_validation: (req, fn) ->
+	run_validation: (req, fn, server_only) ->
 		console.log "WARN: run_validation() method is not implemented!"
 		fn( new Error("run_validation() method is not implemented"), null )
-
-	clientGo : (@element) ->
-		throw new Error("clientGo() method is not implemented")
 
 	typeName : () ->
 		throw new Error("typeName() method is not implemented")
@@ -49,14 +47,26 @@ class @Field extends @FormElement
 		if validation instanceof RegExp
 			@validators.push new Function("value", "next", """
 if( #{validation}.test( value ) == true) next(null);
-else{ next("#{errMsg}"); }
+else{ next(#{JSON.stringify(errMsg)}); }
 """);
 		else if typeof validation == "function"
 			@validators.push validation # push function directly!
 
 		return @
 
-	run_validation: (req, fn) ->
+	###
+	Add Server-side validation
+	@param validation function
+	###
+	validateServer : (validation) ->
+		if !@serverValidators
+			@serverValidators = []
+
+		@serverValidators.push validation
+
+		return @
+
+	run_validation: (req, fn, server_only) ->
 		# Validation for fields
 		val = req.body[ @name() ]
 		delete req.body[ @name() ] # Remove it!
@@ -64,41 +74,65 @@ else{ next("#{errMsg}"); }
 
 		if !@validators
 			@validators = []
+		if !@serverValidators
+			@serverValidators = []
+
+		console.log server_only
+		if server_only == true
+			return @do_server_validation(req, val, fn, error)
 
 		async.each @validators, (validator, n) ->
 			validator val, (err) ->
 				if err
 					error.push err
 				n()
+		, () =>
+			@do_server_validation(req, val, fn, error)
+
+	do_server_validation : (req, val, fn, error) ->
+		async.each @serverValidators, (validator, n) ->
+			validator val, req, (err) ->
+				if err
+					error.push err
+				n()
 		, () ->
-			error = error.join("\n")
-			if error == ""
+			if error.length == 0
 				error = null
+			else
+				error = error.join("<br/>")
 			fn error, val
 
-	clientValidationValues : () ->
-		throw new Error("clientValidationValues() is not implemented")
-
-	clientRender : () ->
-		# Render itself
-		r = @render()
-		# Validation!
-		@do_validation {"body" : @clientValidationValues() }, (err) =>
-			r.data.error = err
-			r.data['client'] = 1
-
-			console.log r
-			@element.innerHTML = swig.run(templates[r.type], r.data)
-			@clientGo(@element)
-
-	extraProps : () ->
-		return {
-			"validators" : "[" + ("#{v}" for v in @validators).join(",") + "]"
-		}
 	client : () ->
-		validators = ("#{v}" for v in @validators).join(",")
+		if !@serverValidators
+			@serverValidators = []
+
+		validators = ( (v.toString().replace("function anonymous", "function")) for v in @validators )
+		if @serverValidators.length != 0
+			validators.push """function(value, next, fldid){
+console.log("validation via server");
+microAjax(form.action + "?request=whattheforms&cmd=validate", function(text){
+	try{
+		var d = JSON.parse(text);
+		if(d.status == "ok"){
+			if(d.error){
+				return next(d.error);
+			}
+			next();
+		} else{
+			next("Internal Error");
+		}
+	} catch(e){
+		console.log(e);
+		next("Internal Error");
+	}
+}, encQS({ "fieldid" : fldid, "value" : value }));
+}
+"""
+
+		validators = validators.join(",")
 		return """{
-	"validators" : [ #{validators} ]
+	"validators" : [ #{validators} ],
+	"id" : #{JSON.stringify(@id())}
 }"""
 
 class @BasicField extends @Field
@@ -129,21 +163,6 @@ class @BasicField extends @Field
 
 	script : () ->
 		return { "require" : "Field", "class" : "Field" }
-
-	clientValidationValues : () ->
-		r = {}
-		r[@name()] = @value()
-		return r
-
-	clientGo : (@element) ->
-		@value = () -> # Override property
-			return @input.value
-
-		@input = @element.getElementsByTagName("input")[0]
-		@input.addEventListener "blur", () =>
-			@clientRender()
-
-		return @
 
 class @TextField extends @BasicField
 	constructor: () -> super "text"

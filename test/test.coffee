@@ -5,10 +5,19 @@ WhatTheForms = require("../src/WhatTheForms.coffee")
 
 form = new WhatTheForms.Form().action("/form")
 
-form.add( new WhatTheForms.BasicField().type("text").name("test1").label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g) )
+srv = (val, req, cb) ->
+	if val == "egg"
+		cb "Eggs are illegal"
+	cb null # We do not like eggs
+
+form.add(
+	new WhatTheForms.BasicField().type("text").name("test1")
+		.label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g)
+		.validateServer(srv)
+)
 
 fieldset = new WhatTheForms.Fieldset().label("Bank details")
-fieldset.add new WhatTheForms.TextField().name("test2").label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g) 
+fieldset.add new WhatTheForms.TextField().name("test2").label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g)
 
 form.add(fieldset)
 

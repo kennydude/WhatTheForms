@@ -12,32 +12,6 @@ ent = require("ent")
 fs = require("fs")
 path = require("path")
 
-# Goodbye SWIG
-'''
-swig = require("swig")
-fallbackswigloader = require("fallbackswigloader")
-if process?.env?.DEBUG? # Turn off template cache when in debug mode!
-	swig.setDefaults({ cache: false })
-
-compileTemplate = (renderer, template_name) ->
-	loader = fallbackswigloader([
-		"templates/#{renderer}",
-		"templates/default"
-	])
-	f = "#{template_name}.html"
-	return swig.precompile(loader.load(f), { filename: f})
-
-renderTemplate = (renderer, template_name, data) ->
-	swig.setDefaults {
-		loader : fallbackswigloader([
-			"templates/#{renderer}",
-			"templates/default"
-		])
-	}
-	return swig.renderFile("#{template_name}.html", data)
-'''
-# END SWIG
-
 templateCache = {}
 t5 = require "t5"
 
@@ -59,12 +33,12 @@ renderTemplate = (renderer, template_name, data) ->
 
 class BasicFormRenderer extends FormRenderer
 	scriptField : (vend, item) ->
-		if !(vend.type in @templates)
+		scrp = vend.script
+
+		if !(@templates[vend.type])
 			console.log vend.type
 			@templates[vend.type] = true
 			@o += compileTemplate(@format, vend.type).manageClass
-
-			scrp = vend.script
 			@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", scrp['require'] + ".js") ).toString()
 
 		@o += """
@@ -78,7 +52,8 @@ form["#{vend.id}"] = new #{scrp.class}().go(document.getElementById("wrap-#{vend
 
 		@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", "WhatTheClass.js") ).toString()
 		@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", "core.js") ).toString()
-		@o += fs.readFileSync( path.join(__dirname, "..", "node_modules", "async", "lib", "async.js") ).toString()
+		@o += fs.readFileSync( path.join(__dirname, "..", "client", "async-each.js") ).toString()
+		@o += fs.readFileSync( path.join(__dirname, "..", "client", "microajax.js") ).toString()
 
 		for item in form.items
 			vend = item.render(@format)
@@ -89,7 +64,7 @@ form["#{vend.id}"] = new #{scrp.class}().go(document.getElementById("wrap-#{vend
 				@scriptField(vend)
 
 		@o = """
-var form = {};
+var form = { "action" : "#{form.action()}" };
 
 #{@o}
 """
