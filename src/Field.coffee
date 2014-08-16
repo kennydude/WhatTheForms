@@ -77,7 +77,6 @@ else{ next(#{JSON.stringify(errMsg)}); }
 		if !@serverValidators
 			@serverValidators = []
 
-		console.log server_only
 		if server_only == true
 			return @do_server_validation(req, val, fn, error)
 
@@ -107,32 +106,12 @@ else{ next(#{JSON.stringify(errMsg)}); }
 			@serverValidators = []
 
 		validators = ( (v.toString().replace("function anonymous", "function")) for v in @validators )
-		if @serverValidators.length != 0
-			validators.push """function(value, next, fldid){
-console.log("validation via server");
-microAjax(form.action + "?request=whattheforms&cmd=validate", function(text){
-	try{
-		var d = JSON.parse(text);
-		if(d.status == "ok"){
-			if(d.error){
-				return next(d.error);
-			}
-			next();
-		} else{
-			next("Internal Error");
-		}
-	} catch(e){
-		console.log(e);
-		next("Internal Error");
-	}
-}, encQS({ "fieldid" : fldid, "value" : value }));
-}
-"""
 
 		validators = validators.join(",")
 		return """{
 	"validators" : [ #{validators} ],
-	"id" : #{JSON.stringify(@id())}
+	"id" : #{JSON.stringify(@id())},
+	"server_validate" : #{@serverValidators.length != 0}
 }"""
 
 class @BasicField extends @Field

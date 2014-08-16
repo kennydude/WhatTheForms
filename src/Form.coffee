@@ -38,6 +38,7 @@ class @Form extends WhatTheClass
 							return res.error 400, "Field was required"
 						for item in @items
 							if item.id() == req.body.fieldid
+								req.body[ item.name() ] = req.body['value']
 								item.do_validation req, (err) ->
 									return res.json {
 										"status" : "ok",

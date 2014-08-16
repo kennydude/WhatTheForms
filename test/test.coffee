@@ -6,8 +6,9 @@ WhatTheForms = require("../src/WhatTheForms.coffee")
 form = new WhatTheForms.Form().action("/form")
 
 srv = (val, req, cb) ->
+	console.log "value: ", val
 	if val == "egg"
-		cb "Eggs are illegal"
+		return cb "Eggs are illegal"
 	cb null # We do not like eggs
 
 form.add(

@@ -1,10 +1,11 @@
 <div data-class="has-error: error
-has-feedback: client || error" class="form-group">
+has-feedback: client || (error || loading)" class="form-group">
 	<block id="contents">Field contents needs to be written :O</block>
-	<span data-if="!error && client" class="glyphicon glyphicon-ok form-control-feedback"></span>
+	<span data-if="!loading && (!error && client)" class="glyphicon glyphicon-ok form-control-feedback"></span>
+	<span data-if="loading" class="glyphicon glyphicon-cloud-download form-control-feedback"></span>
 
 	<div data-if="error">
-		<span class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
+		<span data-if="!loading" class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
 		<p data-html="error" class="text-danger"></p>
 	</div>
 </div>
