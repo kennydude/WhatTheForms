@@ -1,8 +1,10 @@
 <extends file="field.html" />
 <block id="contents">
 <label data-attr="for: id" data-text="label"></label>
-<input data-attr="type: type
+<block id="field">
+    <input data-attr="type: type
 name: name
 id: id
 placeholder: placeholder" data-name="input" data-model="value" class="form-control" />
+</block>
 </block>

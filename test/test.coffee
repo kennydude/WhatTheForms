@@ -16,6 +16,7 @@ form.add(
 		.label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g)
 		.validateServer(srv)
 )
+form.add new WhatTheForms.CSRFField()
 
 fieldset = new WhatTheForms.Fieldset().label("Bank details")
 fieldset.add new WhatTheForms.TextField().name("test2").label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g)
@@ -28,14 +29,16 @@ form.footer(new WhatTheForms.StripeFooter({
 }))
 '''
 
-console.log form.render("bootstrap")
+#console.log form.render("bootstrap")
 
 express = require("express")
 bodyParser = require('body-parser')
+cookieParser = require('cookie-parser')
 
 
 app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cookieParser("https://www.youtube.com/watch?v=sTSA_sWGM44"))
 
 app.use (req, res, next) ->
 	res.error = (err, msg) ->
@@ -47,7 +50,7 @@ app.use (req, res, next) ->
 
 app.all "/form", form.controller(
 	(req, res) ->
-		frm = form.render('bootstrap', req.body)
+		frm = form.render('bootstrap', req.body, req, res)
 		res.end """
 <html>
 <head>

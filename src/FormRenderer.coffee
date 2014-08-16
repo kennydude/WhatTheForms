@@ -34,9 +34,10 @@ renderTemplate = (renderer, template_name, data) ->
 class BasicFormRenderer extends FormRenderer
 	scriptField : (vend, item) ->
 		scrp = vend.script
+		if scrp == null
+			return
 
 		if !(@templates[vend.type])
-			console.log vend.type
 			@templates[vend.type] = true
 			@o += compileTemplate(@format, vend.type).manageClass
 			@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", scrp['require'] + ".js") ).toString()
@@ -56,7 +57,7 @@ form["#{vend.id}"] = new #{scrp.class}().go(document.getElementById("wrap-#{vend
 		@o += fs.readFileSync( path.join(__dirname, "..", "client", "microajax.js") ).toString()
 
 		for item in form.items
-			vend = item.render(@format)
+			vend = item.render()
 			if vend.type == "fieldset" # Special Case!
 				for f in vend.fields
 					@scriptField(f)
@@ -70,7 +71,7 @@ var form = { "action" : "#{form.action()}" };
 """
 		return @o
 
-	render: (form, result) ->
+	render: (form, result, req, res) ->
 		action = ent.encode form.action()
 		o = []
 		fldId = 0
@@ -78,7 +79,7 @@ var form = { "action" : "#{form.action()}" };
 		for item in form.items
 			item.id(form._name + "fld" + fldId)
 
-			vend = item.render(@format)
+			vend = item.render req, res, form
 			if vend.type == "fieldset" # Fieldsets are handled differently at the moment
 				if !vend['data']
 					vend.data = {}
@@ -86,7 +87,9 @@ var form = { "action" : "#{form.action()}" };
 				vend.data.fields = []
 				for field in vend.fields
 					field.data.error = result?.errors?[item.id()]?[field.id]
-					field.data.value = result?[item.id()]?[field.id]
+					rv = result?[item.id()]?[field.id]
+					if rv
+						field.data.value = rv
 					vend.data.fields.push {
 						"id" : field.id.toString(),
 						"value" : renderTemplate(@format, field.type, field.data)
@@ -95,7 +98,9 @@ var form = { "action" : "#{form.action()}" };
 			else
 				# Add result
 				vend.data.error = result?.errors?[ item.id() ]
-				vend.data.value = result?[ item.id() ]
+				rv = result?[ item.id() ]
+				if rv
+					vend.data.value = rv
 
 			o.push {
 				"id" : item.id()

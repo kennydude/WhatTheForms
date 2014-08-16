@@ -59,8 +59,9 @@ class @Form extends WhatTheClass
 				console.log @items
 				result = { "errors" : {} }
 
+				req.action = @action()
+
 				async.each @items, (item, cb) ->
-					console.log "VALIDATE ITEM"
 					item.do_validation req, (err, value) ->
 						if(err)
 							errors = true
@@ -71,7 +72,7 @@ class @Form extends WhatTheClass
 						cb(null)
 					, false
 				, () ->
-					console.log "OK", errors
+					console.log "validation result", errors
 					req.body = result
 					if not errors
 						return process_func(req, res)
@@ -88,17 +89,17 @@ class @Form extends WhatTheClass
     @param format {str} Template set to use
 	@param result {object} optional Result object
     ###
-	render: (format, result) ->
+	render: (format, result, req, res) ->
 		# Only include form renders code path if required
 		FormRenderers = require("./FormRenderer").renderers
 		if typeof format == "string"
 			if FormRenderers[format]
 				r = new FormRenderers[format]()
-				return r.render @, result
+				return r.render @, result, req, res
 			else
 				throw new Error("Form renderer could not be found")
 		else
-			return format.render @, result
+			return format.render @, result, req, res
 
 	###
     Return the Javascript required to make the form function correctly everywhere,

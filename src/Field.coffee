@@ -7,7 +7,7 @@ class @FormElement extends WhatTheClass
 	constructor: () ->
 		throw new Error("Abstract class cannot be instantiated")
 	# Methods
-	render : () ->
+	render : (req) ->
 		throw new Error("render() method is not implemented")
 
 	# DO NOT IMPLEMENT YOURSELF
@@ -102,6 +102,8 @@ else{ next(#{JSON.stringify(errMsg)}); }
 			fn error, val
 
 	client : () ->
+		if !@validators
+			@validators = []
 		if !@serverValidators
 			@serverValidators = []
 
@@ -116,15 +118,15 @@ else{ next(#{JSON.stringify(errMsg)}); }
 
 class @BasicField extends @Field
 	constructor: (@_type) ->
-		@_placeholder = ""
 
 	# Properties
 	@property "type"
-	@property "placeholder"
+	@property "placeholder", ""
+	@property "template_name", "basic_field"
 
-	render : () ->
+	render : (req) ->
 		return {
-			"type" : "basic_field",
+			"type" : @template_name(),
 			"data" : {
 				"type" : @type(),
 				"label" : @label(),
@@ -136,9 +138,6 @@ class @BasicField extends @Field
 			"client" : @client(),
 			"script" : @script()
 		}
-
-	typeName : () ->
-		return "basic_field"
 
 	script : () ->
 		return { "require" : "Field", "class" : "Field" }

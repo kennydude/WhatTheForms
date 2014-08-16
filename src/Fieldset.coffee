@@ -10,7 +10,7 @@ class @Fieldset extends FormElement
 	add : (item) ->
 		@items.push(item)
 
-	render : () ->
+	render : (req, res, form) ->
 		sI = 0
 		for item in @items
 			item.id( @_id + 'si' + sI )
@@ -18,7 +18,7 @@ class @Fieldset extends FormElement
 
 		return {
 			"type" : "fieldset",
-			"fields" : item.render() for item in @items,
+			"fields" : item.render(req, form) for item in @items,
 			"data" : {
 				"label" : @_label
 			}
