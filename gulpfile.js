@@ -15,8 +15,8 @@ gulp.task('default', ["client"]);
 
 gulp.task('dist', ["default"], function(){
 	return gulp	.src("src/*.coffee")
-				.pipe(concat('WhatTheForms.js'))
 				.pipe(preprocess({context: { dist : true } }))
+				.pipe(concat('WhatTheForms.js'))
 				.pipe(coffee())
 				.pipe(gulp.dest("gen/"));
 })

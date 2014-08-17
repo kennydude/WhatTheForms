@@ -1,6 +1,7 @@
 # @exclude
 WhatTheClass = require("./WhatTheClass").WhatTheClass
 BasicFooter = require("./Footer").BasicFooter
+FormRenderers = require("./FormRenderer").FormRenderers
 # @endexclude
 
 async = require "async"
@@ -97,9 +98,6 @@ class @Form extends WhatTheClass
 	@param result {object} optional Result object
     ###
 	render: (format, result, req, res) ->
-		# Only include form renders code path if required
-		FormRenderers = require("./FormRenderer").renderers
-
 		if format == null
 			format = "default"
 
@@ -118,8 +116,6 @@ class @Form extends WhatTheClass
     @param format {str} Template set to use
 	###
 	script : (format) ->
-		# Only include form renders code path if required
-		FormRenderers = require("./FormRenderer").renderers
 		if typeof format == "string"
 			if FormRenderers[format]
 				r = new FormRenderers[format]()

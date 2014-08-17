@@ -1,4 +1,4 @@
-@renderers = {}
+@FormRenderers = {}
 
 class FormRenderer
 	constructor: () ->
@@ -131,10 +131,10 @@ class BootstrapFormRenderer extends BasicFormRenderer
 	constructor: () ->
 		@format = "bootstrap"
 
-@renderers['bootstrap'] = BootstrapFormRenderer
+@FormRenderers['bootstrap'] = BootstrapFormRenderer
 
 class DefaultFormRenderer extends BasicFormRenderer
 	constructor: () ->
 		@format = "default"
 
-@renderers['default'] = DefaultFormRenderer
+@FormRenderers['default'] = DefaultFormRenderer
