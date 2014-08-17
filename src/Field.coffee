@@ -20,9 +20,6 @@ class @FormElement extends WhatTheClass
 		console.log "WARN: run_validation() method is not implemented!"
 		fn( new Error("run_validation() method is not implemented"), null )
 
-	typeName : () ->
-		throw new Error("typeName() method is not implemented")
-
 	script : () ->
 		throw new Error("script() method is not implemented")
 
@@ -122,17 +119,21 @@ class @BasicField extends @Field
 	# Properties
 	@property "type"
 	@property "placeholder", ""
-	@property "template_name", "basic_field"
+	@property "value"
+
+	templateName : () ->
+		return "basic_field"
 
 	render : (req) ->
 		return {
-			"type" : @template_name(),
+			"type" : @templateName(),
 			"data" : {
 				"type" : @type(),
 				"label" : @label(),
 				"name" : @name(),
 				"placeholder" : @placeholder(),
-				"id" : @id() || @name()
+				"id" : @id() || @name(),
+				"value" : @value()
 			},
 			"id" : @id() || @name(),
 			"client" : @client(),

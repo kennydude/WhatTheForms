@@ -1,0 +1,11 @@
+<form method="post" role="form" data-attr="action: action
+id: name" class="whattheforms form-horizontal">
+
+<div data-if="has_errors" class="error message">
+        The form contains errors, please correct them before continuing
+</div>
+
+<div data-repeat="fields" data-html="value" data-attr='id: "wrap-" + id'>{{ value.value | raw }}</div>
+
+<div class="footer" data-html="footer"></div>
+</form>

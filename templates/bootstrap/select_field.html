@@ -1,0 +1,8 @@
+<extends file="basic_field.html" />
+<block id="field">
+    <select data-attr="type: type
+name: name
+id: id" class="form-control" data-model="value">
+      <option data-repeat="options" data-attr="value: $key" data-text="$value"></option>
+    </select>
+</block>

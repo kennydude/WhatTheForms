@@ -3,6 +3,10 @@ fls = require "./Field"
 
 ## More fields!
 
+class @StaticField extends @BasicField
+    constructor: () -> super
+    templateName : () ->
+        return "static_field"
 
 class @SelectField extends @BasicField
     constructor: () ->
@@ -24,7 +28,8 @@ class @SelectField extends @BasicField
 class @HiddenField extends @BasicField
     constructor: () ->
         super "hidden"
-        @template_name "hidden_field"
+    templateName : () ->
+        return "hidden_field"
     client : () ->
         return null
     script: () ->
@@ -37,7 +42,7 @@ class @CSRFField extends @HiddenField
     run_validation: (req, fn, server_only) ->
         val = req.body[ @name() ]
         delete req.body[ @name() ] # Remove it!
-        
+
         if val != req.signedCookies[ new Buffer(req.action + "--csrf").toString("hex") ]
             return fn "CSRF Token is not valid"
         fn null

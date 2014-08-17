@@ -18,6 +18,9 @@ form.add(
 )
 form.add new WhatTheForms.CSRFField()
 
+form.add new WhatTheForms.SelectField().label("Country").option("uk", "United Kingdom").option("us", "United States")
+form.add new WhatTheForms.StaticField().label("Subscriber No").value("129437249")
+
 fieldset = new WhatTheForms.Fieldset().label("Bank details")
 fieldset.add new WhatTheForms.TextField().name("test2").label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g)
 
