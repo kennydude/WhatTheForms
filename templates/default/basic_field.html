@@ -1,8 +1,13 @@
-<label data-attr="for: id" data-text="label"></label>
-<block id="field">
-    <input data-attr="type: type
+<div class="field">
+    <label data-attr="for: id" data-text="label"></label>
+    <div>
+    <block id="field">
+        <input data-attr="type: type
 name: name
 id: id
 placeholder: placeholder" data-name="input" data-model="value" />
-</block>
-<p data-if="error" data-html="error"></p>
+    </block>
+    <p data-if="error" class="error" data-html="error"></p>
+    <p data-if="description" class="description" data-html="description"></p>
+    </div>
+</div>

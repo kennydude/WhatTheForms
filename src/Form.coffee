@@ -1,17 +1,16 @@
 # @exclude
-WhatTheClass = require("./WhatTheClass").WhatTheClass
-BasicFooter = require("./Footer").BasicFooter
-FormRenderers = require("./FormRenderer").FormRenderers
+@WhatTheClass = require("./WhatTheClass").WhatTheClass
+@BasicFooter = require("./Footer").BasicFooter
+@FormRenderers = require("./FormRenderer").FormRenderers
 # @endexclude
-
 async = require "async"
 
-class @Form extends WhatTheClass
+class @Form extends @WhatTheClass
 	constructor: () ->
 		@items = []
 		@_attrs = { "folders" : [] }
 
-		@footer(new BasicFooter)
+		@footer(new module.exports.BasicFooter)
 
 	@property "action", null
 	@property "name", "frm1"
@@ -35,6 +34,9 @@ class @Form extends WhatTheClass
 	controller : (view_func, process_func) ->
 		# I control express routes!
 		return (req, res) =>
+			if !@action()
+				@action req.path
+
 			req.form = @
 
 			if req.query['request'] == "whattheforms"
@@ -102,8 +104,8 @@ class @Form extends WhatTheClass
 			format = "default"
 
 		if typeof format == "string"
-			if FormRenderers[format]
-				r = new FormRenderers[format]()
+			if module.exports.FormRenderers[format]
+				r = new module.exports.FormRenderers[format]()
 				return r.render @, result, req, res, @_attrs
 			else
 				throw new Error("Form renderer could not be found")
@@ -117,8 +119,8 @@ class @Form extends WhatTheClass
 	###
 	script : (format) ->
 		if typeof format == "string"
-			if FormRenderers[format]
-				r = new FormRenderers[format]()
+			if module.exports.FormRenderers[format]
+				r = new module.exports.FormRenderers[format]()
 				return r.script(@)
 			else
 				throw new Error("Form renderer could not be found")

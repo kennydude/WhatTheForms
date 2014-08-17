@@ -1,8 +1,8 @@
 # @exclude
-WhatTheClass = require("./WhatTheClass").WhatTheClass
+@WhatTheClass = require("./WhatTheClass").WhatTheClass
 # @endexclude
 
-class @Footer extends WhatTheClass
+class @Footer extends @WhatTheClass
 	render : () ->
 		throw new Error("render() is not defined")
 

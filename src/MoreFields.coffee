@@ -39,6 +39,22 @@ class @HiddenField extends @BasicField
     script: () ->
         return null
 
+class @TextAreaField extends @BasicField
+    templateName: () ->
+        return "text_area"
+    @property "rows"
+    @property "cols"
+
+    render: (req, res, form) ->
+        d = super req, res, form
+        d.data['rows'] = @rows()
+        d.data['cols'] = @cols()
+        return d
+
+class @CheckboxField extends @BasicField
+    templateName: () ->
+        return "checkbox_field"
+
 class @CSRFField extends @HiddenField
     constructor: () ->
         super
@@ -52,7 +68,7 @@ class @CSRFField extends @HiddenField
         fn null
 
     render : (req, res, form) ->
-        d = super req, form
+        d = super req, res, form
 
         if !req
             return d

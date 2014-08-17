@@ -1,9 +1,9 @@
 # @exclude
-FormElement = require("./Field").FormElement
+@FormElement = require("./Field").FormElement
 async = require("async")
 # @endexclude
 
-class @Fieldset extends FormElement
+class @Fieldset extends @FormElement
 	constructor: () ->
 		@items = []
 

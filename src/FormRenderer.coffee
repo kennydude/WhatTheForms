@@ -20,7 +20,7 @@ compileTemplate = (renderer, template_name, attrs) ->
 		return templateCache[template_name]
 
 	folders = []
-	for mainDir in attrs.folders.concat(["templates"])
+	for mainDir in attrs.folders.concat([ path.join( __dirname, "..", "templates" ) ])
 		folders.push path.join mainDir, renderer
 		folders.push path.join mainDir, "default"
 

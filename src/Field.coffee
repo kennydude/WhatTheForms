@@ -1,9 +1,9 @@
 # @exclude
-WhatTheClass = require("./WhatTheClass").WhatTheClass
+@WhatTheClass = require("./WhatTheClass").WhatTheClass
 async = require("async")
 # @endexclude
 
-class @FormElement extends WhatTheClass
+class @FormElement extends @WhatTheClass
 	@property "id"
 
 	constructor: () ->
@@ -31,6 +31,8 @@ class @Field extends @FormElement
 	# Properties
 	@property "name"
 	@property "label"
+	@property "required", false
+	@property "description"
 
 	###
     Add Client-Side validator
@@ -75,6 +77,9 @@ else{ next(#{JSON.stringify(errMsg)}); }
 			@validators = []
 		if !@serverValidators
 			@serverValidators = []
+
+		if @required() == true && !val
+			error.push "Required"
 
 		if server_only == true
 			return @do_server_validation(req, val, fn, error)
@@ -135,7 +140,9 @@ class @BasicField extends @Field
 				"name" : @name(),
 				"placeholder" : @placeholder(),
 				"id" : @id() || @name(),
-				"value" : @value()
+				"value" : @value(),
+				"required" : @required(),
+				"description" : @description()
 			},
 			"id" : @id() || @name(),
 			"client" : @client(),

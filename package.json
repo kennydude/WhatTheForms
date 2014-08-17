@@ -13,10 +13,11 @@
     "gulp": "^3.8.7",
     "gulp-coffee": "^2.1.1",
     "gulp-concat": "^2.3.4",
+    "gulp-file-include": "^0.4.1",
     "gulp-preprocess": "^1.1.1",
     "gulp-replace": "^0.4.0"
   },
-  "main": "WhatTheForms.js",
+  "main": "src/WhatTheForms.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/kennydude/whattheforms"
