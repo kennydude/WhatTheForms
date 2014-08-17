@@ -39,7 +39,6 @@ class @Field extends @Box
 		er = [ @clErr, @srErr ].join("<br/>")
 		if er == "<br/>"
 			er = null
-		console.log er, @srErr, @clErr
 		@template.error = er
 
 	go: (wrap, data) ->

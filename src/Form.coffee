@@ -92,6 +92,10 @@ class @Form extends WhatTheClass
 	render: (format, result, req, res) ->
 		# Only include form renders code path if required
 		FormRenderers = require("./FormRenderer").renderers
+
+		if format == null
+			format = "default"
+
 		if typeof format == "string"
 			if FormRenderers[format]
 				r = new FormRenderers[format]()

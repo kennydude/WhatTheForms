@@ -1,14 +1,19 @@
-<extends file="field.html" />
-<block id="contents">
-     <div class="form-group">
-        <label class="col-sm-2 control-label" data-attr="for: id" data-text="label"></label>
-        <div class="col-sm-10">
-            <block id="field">
-                <input data-attr="type: type
-            name: name
-            id: id
-            placeholder: placeholder" data-name="input" data-model="value" class="form-control" />
-            </block>
+<div data-class="has-error: error
+has-feedback: client || (error || loading)" class="form-group">
+    <label class="col-sm-2 control-label" data-attr="for: id" data-text="label"></label>
+    <div class="col-sm-10">
+        <block id="field">
+            <input data-attr="type: type
+        name: name
+        id: id
+        placeholder: placeholder" data-name="input" data-model="value" class="form-control" />
+        </block>
+        <span data-if="!loading && (!error && client)" class="glyphicon glyphicon-ok form-control-feedback"></span>
+        <span data-if="loading" class="glyphicon glyphicon-cloud-download form-control-feedback"></span>
+
+        <div data-if="error">
+            <span data-if="!loading" class="glyphicon glyphicon-exclamation-sign form-control-feedback"></span>
+            <p data-html="error" class="text-danger"></p>
         </div>
     </div>
-</block>
+</div>

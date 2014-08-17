@@ -7,6 +7,8 @@ class @StaticField extends @BasicField
     constructor: () -> super
     templateName : () ->
         return "static_field"
+    client: () -> return null
+    script: () -> return null
 
 class @SelectField extends @BasicField
     constructor: () ->

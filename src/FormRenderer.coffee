@@ -125,3 +125,9 @@ class BootstrapFormRenderer extends BasicFormRenderer
 		@format = "bootstrap"
 
 @renderers['bootstrap'] = BootstrapFormRenderer
+
+class DefaultFormRenderer extends BasicFormRenderer
+	constructor: () ->
+		@format = "default"
+
+@renderers['default'] = DefaultFormRenderer
