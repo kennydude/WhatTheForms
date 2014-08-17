@@ -1,7 +1,7 @@
 # Basic "does it work" tests
 process.env['DEBUG'] = true
 
-WhatTheForms = require("../src/WhatTheForms.coffee")
+WhatTheForms = require("../lib/WhatTheForms.coffee")
 
 form = new WhatTheForms.Form().action("/form")
 

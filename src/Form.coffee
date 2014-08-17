@@ -6,6 +6,7 @@ async = require "async"
 class @Form extends WhatTheClass
 	constructor: () ->
 		@items = []
+		@_attrs = { "folders" : [] }
 
 		@footer(new BasicFooter)
 
@@ -15,6 +16,10 @@ class @Form extends WhatTheClass
 
 	add: (item) ->
 		@items.push(item)
+
+	addTemplateFolder : (folder) ->
+		@_attrs.folders.push folder
+		return @
 
 	###
     Controls the server-side Express route for the form
@@ -99,11 +104,11 @@ class @Form extends WhatTheClass
 		if typeof format == "string"
 			if FormRenderers[format]
 				r = new FormRenderers[format]()
-				return r.render @, result, req, res
+				return r.render @, result, req, res, @_attrs
 			else
 				throw new Error("Form renderer could not be found")
 		else
-			return format.render @, result, req, res
+			return format.render @, result, req, res, @_attrs
 
 	###
     Return the Javascript required to make the form function correctly everywhere,

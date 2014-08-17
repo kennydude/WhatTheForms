@@ -15,21 +15,24 @@ path = require("path")
 templateCache = {}
 t5 = require "t5"
 
-compileTemplate = (renderer, template_name) ->
+compileTemplate = (renderer, template_name, attrs) ->
 	if templateCache[template_name]
 		return templateCache[template_name]
+
+	folders = []
+	for mainDir in attrs.folders.concat(["templates"])
+		folders.push path.join mainDir, renderer
+		folders.push path.join mainDir, "default"
+
 	tpl = t5.compileFile("#{template_name}.html", {
-		loader : new t5.T5FallbackFileTemplateLoader([
-			"templates/#{renderer}",
-			"templates/default"
-		]),
+		loader : new t5.T5FallbackFileTemplateLoader(folders),
 		name : "tpl_#{template_name}"
 	})
 	templateCache[template_name] = tpl
 	return tpl
 
-renderTemplate = (renderer, template_name, data) ->
-	return compileTemplate(renderer, template_name).build()(ent, data)
+renderTemplate = (renderer, template_name, data, attrs) ->
+	return compileTemplate(renderer, template_name, attrs).build()(ent, data)
 
 class BasicFormRenderer extends FormRenderer
 	scriptField : (vend, item) ->
@@ -71,10 +74,14 @@ var form = { "action" : "#{form.action()}" };
 """
 		return @o
 
-	render: (form, result, req, res) ->
+	render: (form, result, req, res, attrs) ->
 		action = ent.encode form.action()
 		o = []
 		fldId = 0
+
+		if !attrs
+			attrs = {}
+		attrs.folders = attrs.folders || []
 
 		for item in form.items
 			item.id(form._name + "fld" + fldId)
@@ -92,7 +99,7 @@ var form = { "action" : "#{form.action()}" };
 						field.data.value = rv
 					vend.data.fields.push {
 						"id" : field.id.toString(),
-						"value" : renderTemplate(@format, field.type, field.data)
+						"value" : renderTemplate(@format, field.type, field.data, attrs)
 					}
 					fldId++
 			else
@@ -104,20 +111,20 @@ var form = { "action" : "#{form.action()}" };
 
 			o.push {
 				"id" : item.id()
-				"value" : renderTemplate(@format, vend.type, vend.data)
+				"value" : renderTemplate(@format, vend.type, vend.data, attrs)
 			}
 			fldId++
 
 
 		footer = form.footer().render()
-		footer = renderTemplate(@format, "footer_#{footer.type}", footer.data)
+		footer = renderTemplate(@format, "footer_#{footer.type}", footer.data, attrs)
 
 		o = renderTemplate(@format, "form", {
 			"fields" : o,
 			"action" : action,
 			"footer" : footer,
 			"name" : form.name()
-		})
+		}, attrs)
 		return o
 
 class BootstrapFormRenderer extends BasicFormRenderer
