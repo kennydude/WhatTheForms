@@ -1,4 +1,6 @@
+# @exclude
 WhatTheClass = require("./WhatTheClass").WhatTheClass
+# @endexclude
 
 class @Footer extends WhatTheClass
 	render : () ->

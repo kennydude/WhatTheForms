@@ -1,5 +1,7 @@
+# @exclude
 WhatTheClass = require("./WhatTheClass").WhatTheClass
 BasicFooter = require("./Footer").BasicFooter
+# @endexclude
 
 async = require "async"
 

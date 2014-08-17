@@ -1,5 +1,7 @@
+# @exclude
 WhatTheClass = require("./WhatTheClass").WhatTheClass
 async = require("async")
+# @endexclude
 
 class @FormElement extends WhatTheClass
 	@property "id"

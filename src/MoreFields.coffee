@@ -1,5 +1,7 @@
+# @exclude
 fls = require "./Field"
 @BasicField = fls.BasicField
+# @endexclude
 
 ## More fields!
 
