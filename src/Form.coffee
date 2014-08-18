@@ -17,6 +17,8 @@ class @Form extends @WhatTheClass
 	@property "footer"
 
 	add: (item) ->
+		if item.name() == "errors"
+			throw new Error("errors is not allowed as WhatTheForms uses this already!")
 		@items.push(item)
 
 	addTemplateFolder : (folder) ->
@@ -31,13 +33,21 @@ class @Form extends @WhatTheClass
     @param {function} Displays the form
     @param {function} Processes the form (once validated and checked)
 	###
-	controller : (view_func, process_func) ->
+	controller : (def_func, view_func, process_func) ->
+		if arguments.length == 2
+			 x = view_func
+	        view_func = def_func
+	        process_func = x
+	        def_func = null
+
 		# I control express routes!
 		return (req, res) =>
 			if !@action()
 				@action req.path
 
 			req.form = @
+			render_func = (method) =>
+				return @render method, req.body, req, res
 
 			if req.query['request'] == "whattheforms"
 				switch req.query['cmd']
@@ -66,31 +76,50 @@ class @Form extends @WhatTheClass
 					return res.error 400, "POST Body not provided"
 
 				errors = false
-				console.log @items
 				result = { "errors" : {} }
 
 				req.action = @action()
 
-				async.each @items, (item, cb) ->
-					item.do_validation req, (err, value) ->
-						if(err)
-							errors = true
+				preF = []
+				if def_func != null
+					preF = [
+						(cb) ->
+							def_func req, res, (r) ->
+								result = r
+								if !result['errors']
+									result['errors'] = {}
+								cb()
+					]
 
-						result[item.id()] = value
-						result.errors[item.id()] = err
+				async.series preF, () =>
+					async.each @items, (item, cb) ->
+						item.do_validation req, (err, value) ->
+							if err
+								errors = true
 
-						cb(null)
-					, false
-				, () ->
-					console.log "validation result", errors
-					req.body = result
-					if not errors
-						return process_func(req, res)
+							if value
+								result[item.name()] = value
+							result.errors[item.name()] = err
 
-					req.has_errors = true
-					return view_func(req, res)
+							cb(null)
+						, false
+					, () ->
+						req.body = result
+						if not errors
+							return process_func(req, res)
+
+						req.has_errors = true
+						return view_func(req, res, render_func)
 			else if req.method == "GET"
-				return view_func(req, res)
+				if def_func != null
+					return async.series [
+						(cb) ->
+							def_func req, res, (result) ->
+								req.body = result
+								cb()
+					], () ->
+						return view_func req, res, render_func
+				return view_func(req, res, render_func)
 			else
 				res.error 404, "Unsupported Method"
 

@@ -38,7 +38,7 @@ class @Fieldset extends @FormElement
 				if err
 					errors[item.id()] = err
 					hasErrors = true
-				values[item.id()] = val
+				values[item.name()] = val
 				console.log item.id(), err, "ERRRRR"
 				next()
 		, () ->

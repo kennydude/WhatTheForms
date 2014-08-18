@@ -93,8 +93,8 @@ var form = { "action" : "#{form.action()}" };
 
 				vend.data.fields = []
 				for field in vend.fields
-					field.data.error = result?.errors?[item.id()]?[field.id]
-					rv = result?[item.id()]?[field.id]
+					field.data.error = result?.errors?[item.name()]?[field.name]
+					rv = result?[item.name()]?[field.name]
 					if rv
 						field.data.value = rv
 					vend.data.fields.push {
@@ -104,8 +104,8 @@ var form = { "action" : "#{form.action()}" };
 					fldId++
 			else
 				# Add result
-				vend.data.error = result?.errors?[ item.id() ]
-				rv = result?[ item.id() ]
+				vend.data.error = result?.errors?[ item.name() ]
+				rv = result?[ item.name() ]
 				if rv
 					vend.data.value = rv
 
