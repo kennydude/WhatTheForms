@@ -25,6 +25,9 @@ class @FormElement extends @WhatTheClass
 	script : () ->
 		throw new Error("script() method is not implemented")
 
+	method : (methodName, req, res) ->
+		res.end("Not implemented")
+
 	extraProps : () -> # Do nothing
 
 class @Field extends @FormElement

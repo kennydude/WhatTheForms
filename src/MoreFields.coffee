@@ -11,6 +11,8 @@ class @StaticField extends @BasicField
         return "static_field"
     client: () -> return null
     script: () -> return null
+    run_validation: (req, fn, server_only) ->
+        fn null
 
 class @SelectField extends @BasicField
     constructor: () ->
@@ -84,3 +86,22 @@ class @CSRFField extends @HiddenField
         res.cookie(new Buffer(form.action() + "--csrf").toString("hex"), token, { signed: true })
 
         return d
+
+"""
+List of stuff that can do everything except Updating individual items
+"""
+class @CRDListField extends @BasicField
+    templateName: () ->
+        return "crd_list"
+
+    @property "deleteMethod"
+
+    method: (methodName, req, res) ->
+        switch methodName
+            when "delete"
+                @deleteMethod req.body[ "delItem" ], req.data?, (err) ->
+                    if err
+                        return res.error(503, err)
+                    return res.redirect req.path
+            else
+                return res.error(400, "Invalid method requested")

@@ -17,7 +17,7 @@ class @Form extends @WhatTheClass
 	@property "footer"
 
 	add: (item) ->
-		if item.name() == "errors"
+		if item.name?() == "errors"
 			throw new Error("errors is not allowed as WhatTheForms uses this already!")
 		@items.push(item)
 
@@ -25,20 +25,25 @@ class @Form extends @WhatTheClass
 		@_attrs.folders.push folder
 		return @
 
+	getItemById : (id) ->
+		for item in @items
+			if item.id() == id
+				return item
+
 	###
-    Controls the server-side Express route for the form
+	Controls the server-side Express route for the form
 
-    Assumes middleware that provides res.error(code, message)
+	Assumes middleware that provides res.error(code, message)
 
-    @param {function} Displays the form
-    @param {function} Processes the form (once validated and checked)
+	@param {function} Displays the form
+	@param {function} Processes the form (once validated and checked)
 	###
 	controller : (def_func, view_func, process_func) ->
 		if arguments.length == 2
 			 x = view_func
-	        view_func = def_func
-	        process_func = x
-	        def_func = null
+			view_func = def_func
+			process_func = x
+			def_func = null
 
 		# I control express routes!
 		return (req, res) =>
@@ -56,19 +61,38 @@ class @Form extends @WhatTheClass
 					when "validate"
 						if !req.body['fieldid']
 							return res.error 400, "Field was required"
-						for item in @items
-							if item.id() == req.body.fieldid
-								req.body[ item.name() ] = req.body['value']
-								item.do_validation req, (err) ->
-									return res.json {
-										"status" : "ok",
-										"error" : err
-									}
-								, true
-								return
-						return res.json {
-							"status" : "fail"
-						}
+
+						item = @getItemById(req.body.fieldid)
+						if !item
+							return res.json {
+								"status" : "fail"
+							}
+
+						req.body[ item.name() ] = req.body['value']
+						item.do_validation req, (err) ->
+							return res.json {
+								"status" : "ok",
+								"error" : err
+							}
+						, true
+						return
+					when "method"
+						# Custom method
+						if !req.query['fieldid']
+							return res.error 400, "Field was required"
+
+						item = @getItemById(req.query.fieldid)
+						if !item
+							return res.json {
+								"status" : "fail"
+							}
+
+						if def_func != null
+							def_func req, res, (r) ->
+								req.data = r
+								return item.method( req.query.method, req, res )
+						else
+							return item.method(req.query.method, req, res)
 					else
 						return res.error 404, "WhatTheForms Method is not available"
 			else if req.method == "POST"
@@ -124,10 +148,10 @@ class @Form extends @WhatTheClass
 				res.error 404, "Unsupported Method"
 
 	###
-    Return the HTML of the form
-    @param format {str} Template set to use
+	Return the HTML of the form
+	@param format {str} Template set to use
 	@param result {object} optional Result object
-    ###
+	###
 	render: (format, result, req, res) ->
 		if format == null
 			format = "default"
@@ -142,9 +166,9 @@ class @Form extends @WhatTheClass
 			return format.render @, result, req, res, @_attrs
 
 	###
-    Return the Javascript required to make the form function correctly everywhere,
-    and to validate inline!
-    @param format {str} Template set to use
+	Return the Javascript required to make the form function correctly everywhere,
+	and to validate inline!
+	@param format {str} Template set to use
 	###
 	script : (format) ->
 		if typeof format == "string"
