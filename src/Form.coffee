@@ -40,7 +40,7 @@ class @Form extends @WhatTheClass
 	###
 	controller : (def_func, view_func, process_func) ->
 		if arguments.length == 2
-			 x = view_func
+			x = view_func
 			view_func = def_func
 			process_func = x
 			def_func = null
@@ -51,8 +51,8 @@ class @Form extends @WhatTheClass
 				@action req.path
 
 			req.form = @
-			render_func = (method) =>
-				return @render method, req.body, req, res
+			render_func = (format) =>
+				return @render( format, req.body, req, res )
 
 			if req.query['request'] == "whattheforms"
 				switch req.query['cmd']
@@ -153,9 +153,9 @@ class @Form extends @WhatTheClass
 	@param result {object} optional Result object
 	###
 	render: (format, result, req, res) ->
-		if format == null
+		if !format
 			format = "default"
-
+		
 		if typeof format == "string"
 			if module.exports.FormRenderers[format]
 				r = new module.exports.FormRenderers[format]()

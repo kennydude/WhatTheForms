@@ -94,7 +94,14 @@ class @CRDListField extends @BasicField
     templateName: () ->
         return "crd_list"
 
+    @property "capabilitiesMethod"
     @property "deleteMethod"
+    @property "addMethod"
+
+    render: () ->
+        d = super
+
+        return d
 
     method: (methodName, req, res) ->
         switch methodName
@@ -103,5 +110,6 @@ class @CRDListField extends @BasicField
                     if err
                         return res.error(503, err)
                     return res.redirect req.path
+                , req
             else
                 return res.error(400, "Invalid method requested")
