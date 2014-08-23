@@ -106,6 +106,11 @@ class @Form extends @WhatTheClass
 						if !item
 							return res.error 400, "Unknown request", { error : "method-fld-undefined" }
 
+						if req.method == "GET"
+							req.body = {
+								"method_value" : req.query['method_value']
+							}
+
 						if def_func != null
 							def_func req, res, (r) ->
 								req.data = r

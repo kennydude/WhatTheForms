@@ -112,12 +112,18 @@ class @CRDListField extends @BasicField
         capabilities = @capabilitiesMethod()(req)
         if capabilities.indexOf( methodName ) == -1
             return res.error(401, "Unauthorized", { "err" : "cap-not-inc" })
+        if !req.body?['method_value']
+            return res.error(400, "Bad Request", { "err" : "no-method-value" })
 
         switch methodName
+            when "add"
+                @addMethod()( req.body['method_value'], req['data'], (err) ->
+                    if err
+                        return res.error(503, err)
+                    return res.redirect req.path # TODO: Change this
+                , req)
             when "delete"
-                console.log "DELETE"
                 @deleteMethod()( req.body[ "method_value" ], req['data'], (err) ->
-                    console.log "done"
                     if err
                         return res.error(503, err)
                     return res.redirect req.path

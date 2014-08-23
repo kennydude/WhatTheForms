@@ -34,6 +34,12 @@ class @BasicFooter extends @Footer
 			}
 		}
 
+class @EmptyFooter extends @Footer
+		render : () ->
+			return {
+				"type" : "empty"
+			}
+
 ###
 Charge Money with Stripe
 

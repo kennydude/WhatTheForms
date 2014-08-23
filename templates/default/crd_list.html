@@ -4,14 +4,13 @@
         <li data-repeat="value">
             <span data-html="$value"></span>
 
-            <button
+            <a
                 data-if="can_delete"
                 type="submit"
                 class="delete"
-                data-attr='name: ("$" + id) + "$delete"
-value: $key'>
+                data-attr='href: ("?request=whattheforms&cmd=method&method=delete&fieldid=" + id) + ("&method_value=" + $key)'>
                 &cross;
-            </button>
+            </a>
         </li>
         <li data-if="can_add">
             <input type="text" data-attr='name: ("$" + id) + "$add"' />
