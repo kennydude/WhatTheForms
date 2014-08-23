@@ -84,8 +84,6 @@ var form = { "action" : "#{form.action()}" };
 		attrs.folders = attrs.folders || []
 
 		for item in form.items
-			item.id(form._name + "fld" + fldId)
-
 			vend = item.render req, res, form
 			if vend.type == "fieldset" # Fieldsets are handled differently at the moment
 				if !vend['data']

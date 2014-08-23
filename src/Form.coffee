@@ -19,6 +19,10 @@ class @Form extends @WhatTheClass
 	add: (item) ->
 		if item.name?() == "errors"
 			throw new Error("errors is not allowed as WhatTheForms uses this already!")
+		if item.name?().charAt(0) == "$"
+			throw new Error("$ as the first character is not allowed as WhatTheForms uses this already!")
+		item.id(@_name + "fld" + @items.length)
+
 		@items.push(item)
 
 	addTemplateFolder : (folder) ->
@@ -49,6 +53,23 @@ class @Form extends @WhatTheClass
 		return (req, res) =>
 			if !@action()
 				@action req.path
+
+			# Pre-method working
+			if req.body
+				for key, v of req.body
+					if key.charAt(0) == "$"
+						# Method posted!
+						parts = key.split("$")
+						if parts.length < 3
+							return res.error 400, "Invalid request", { "error" : "$-err" }
+
+						req.query['request'] = "whattheforms"
+						req.query['cmd'] = "method"
+						req.query['output'] = "html"
+						req.query['fieldid'] = parts[1]
+						req.query['method'] = parts[2]
+						req.body['method_value'] = v
+						console.log "$ method activated", req.query, req.body
 
 			req.form = @
 			render_func = (format) =>
@@ -83,9 +104,7 @@ class @Form extends @WhatTheClass
 
 						item = @getItemById(req.query.fieldid)
 						if !item
-							return res.json {
-								"status" : "fail"
-							}
+							return res.error 400, "Unknown request", { error : "method-fld-undefined" }
 
 						if def_func != null
 							def_func req, res, (r) ->
@@ -155,7 +174,7 @@ class @Form extends @WhatTheClass
 	render: (format, result, req, res) ->
 		if !format
 			format = "default"
-		
+
 		if typeof format == "string"
 			if module.exports.FormRenderers[format]
 				r = new module.exports.FormRenderers[format]()

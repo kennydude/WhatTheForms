@@ -5,13 +5,16 @@
             <span data-html="$value"></span>
 
             <button
+                data-if="can_delete"
                 type="submit"
-                name="delItem"
-                value="$key"
                 class="delete"
-                formaction="?request=whattheforms&cmd=method&method=delete&fieldid={{ id }}">
+                data-attr='name: ("$" + id) + "$delete"
+value: $key'>
                 &cross;
             </button>
+        </li>
+        <li data-if="can_add">
+            <input type="text" data-attr='name: ("$" + id) + "$add"' />
         </li>
     </ul>
 </block>

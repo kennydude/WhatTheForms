@@ -94,22 +94,33 @@ class @CRDListField extends @BasicField
     templateName: () ->
         return "crd_list"
 
-    @property "capabilitiesMethod"
+    @property "capabilitiesMethod", () ->
+        return ["delete", "add", "read"]
     @property "deleteMethod"
     @property "addMethod"
 
-    render: () ->
-        d = super
+    render: (req, res, form) ->
+        d = super req, res, form
+
+        capabilities = @capabilitiesMethod()(req)
+        for capability in capabilities
+            d.data["can_#{capability}"] = true
 
         return d
 
     method: (methodName, req, res) ->
+        capabilities = @capabilitiesMethod()(req)
+        if capabilities.indexOf( methodName ) == -1
+            return res.error(401, "Unauthorized", { "err" : "cap-not-inc" })
+
         switch methodName
             when "delete"
-                @deleteMethod req.body[ "delItem" ], req.data?, (err) ->
+                console.log "DELETE"
+                @deleteMethod()( req.body[ "method_value" ], req['data'], (err) ->
+                    console.log "done"
                     if err
                         return res.error(503, err)
                     return res.redirect req.path
-                , req
+                , req)
             else
                 return res.error(400, "Invalid method requested")
