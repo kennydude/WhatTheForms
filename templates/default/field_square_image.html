@@ -1,13 +1,15 @@
 <extends file="basic_field.html" />
 <block id="field">
-    <dialog data-id="dialog">
-        <input type="file" data-id="image" />
-        <div id="img" class="container">
-            <div class="viewfinder">
+    <dialog data-name="dialog">
+        <input type="file" data-id="file" accept="image/*" />
+        <div class="cropper">
+            <div data-id="container" class="container">
+                <div class="viewfinder">
+                </div>
+                <img data-id="rimg" data-attr="src: cropImage" />
             </div>
-            <img data-id="rimg" data-attr="src: cropImage" />
+            <input type="range" min="0" step="0.01" max="1" value="1" data-id="zoom" />
         </div>
-        <input type="range" min="0" step="0.01" max="1" value="1" data-id="zoom" />
         <a class="button" data-id="save">Save</a>
     </dialog>
     <div data-if="value">

@@ -17,14 +17,13 @@ form.add(
 		.validateServer(srv)
 )
 form.add new WhatTheForms.CSRFField()
+form.add new WhatTheForms.SquareImage().name("avatar").label("Test")
 
 form.add new WhatTheForms.SelectField().label("Country").option("uk", "United Kingdom").option("us", "United States").name("country")
 form.add new WhatTheForms.StaticField().label("Subscriber No").value("129437249").name("subscriber")
 
 fieldset = new WhatTheForms.Fieldset().label("Bank details")
 fieldset.add new WhatTheForms.TextField().name("test2").label("Testing").placeholder("OKFISH").validate(/^[a-z]$/g)
-
-fieldset.add new WhatTheForms.SquareImage().name("avatar").label("Test")
 
 form.add(fieldset)
 

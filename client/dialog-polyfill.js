@@ -24,6 +24,9 @@ function dialogPolyfill(element){
   element.style.display = "none";
   element.style.position = "fixed";
   element.style.zIndex = 10000;
+  if(!element.style.background){
+      element.style.background = "#FFF";
+  }
 
   element.show = function(){
     element.style.display = "block";
@@ -62,6 +65,8 @@ function dialogPolyfill(element){
       } else if (first_form_ctrl !== null) {
         first_form_ctrl.focus();
       }
+
+      _rszDialogs()
   };
   element.close = function(){
     element.style.display = "none";

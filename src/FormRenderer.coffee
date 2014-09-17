@@ -46,6 +46,7 @@ class BasicFormRenderer extends FormRenderer
 			@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", scrp['require'] + ".js") ).toString()
 
 		@o += """
+console.log("#{vend.id}");
 form["#{vend.id}"] = new #{scrp.class}().go(document.getElementById("wrap-#{vend.id}"), #{vend.client});
 """
 
@@ -58,6 +59,7 @@ form["#{vend.id}"] = new #{scrp.class}().go(document.getElementById("wrap-#{vend
 		@o += fs.readFileSync( path.join(__dirname, "..", "client", "gen", "core.js") ).toString()
 		@o += fs.readFileSync( path.join(__dirname, "..", "client", "async-each.js") ).toString()
 		@o += fs.readFileSync( path.join(__dirname, "..", "client", "microajax.js") ).toString()
+		@o += fs.readFileSync( path.join(__dirname, "..", "client", "dialog-polyfill.js") ).toString()
 
 		for item in form.items
 			vend = item.render()
