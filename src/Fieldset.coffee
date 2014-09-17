@@ -2,10 +2,15 @@
 @FormElement = require("./Field").FormElement
 async = require("async")
 # @endexclude
+globalFieldsetCounter = 0
 
 class @Fieldset extends @FormElement
+	@property "name"
+
 	constructor: () ->
 		@items = []
+		@name "fieldset#{globalFieldsetCounter}"
+		globalFieldsetCounter += 1
 
 	label : (@_label) ->
 		return this

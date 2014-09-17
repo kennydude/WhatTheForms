@@ -17,10 +17,17 @@ class @Form extends @WhatTheClass
 	@property "footer"
 
 	add: (item) ->
-		if item.name?() == "errors"
-			throw new Error("errors is not allowed as WhatTheForms uses this already!")
-		if item.name?().charAt(0) == "$"
-			throw new Error("$ as the first character is not allowed as WhatTheForms uses this already!")
+		if !item
+			throw new Error("A form field was not provided")
+
+		if item.name
+			if !item.name()
+				throw new Error("Field does not have a name")
+			if item.name() == "errors"
+				throw new Error("errors is not allowed as WhatTheForms uses this already!")
+			if item.name().charAt(0) == "$"
+				throw new Error("$ as the first character is not allowed as WhatTheForms uses this already!")
+
 		item.id(@_name + "fld" + @items.length)
 
 		@items.push(item)

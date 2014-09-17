@@ -6,4 +6,5 @@
 #include("../src/Field.coffee")
 #include("../src/Fieldset.coffee")
 #include("../src/MoreFields.coffee")
+#include("../src/FieldSquareImage.coffee")
 #include("../src/Footer.coffee")
