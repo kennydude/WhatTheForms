@@ -1,4 +1,4 @@
-var _dialogs = [];
+var _dialogs = [], _currentDialog = null;
 var _modal = document.createElement("div");
 document.body.appendChild(_modal);
 _modal.style.position = "fixed";
@@ -6,6 +6,9 @@ _modal.style.left = 0; _modal.style.right = 0; _modal.style.top = 0; _modal.styl
 _modal.style.background = "rgba(200, 200, 200, 0.7)";
 _modal.style.zIndex = 9999;
 _modal.style.display = "none";
+_modal.addEventListener("click", function(){
+    _currentDialog.close();
+});
 
 function dialogPolyfill(element){
   // Do multiple
@@ -66,11 +69,13 @@ function dialogPolyfill(element){
         first_form_ctrl.focus();
       }
 
-      _rszDialogs()
+      _rszDialogs();
+      _currentDialog = this;
   };
   element.close = function(){
     element.style.display = "none";
     _modal.style.display = "none";
+    _currentDialog = null;
   }
 }
 function _rszDialogs(){

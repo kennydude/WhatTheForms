@@ -56,6 +56,11 @@ class @SquareImage extends @Field
             imageType = /image.*/
 
             if (file.type.match(imageType))
+                @template.rimg.removeAttribute "width"
+                @template.rimg.removeAttribute "height"
+                @template.zoom.value = 1
+                @template.fileSelected = true
+
             	reader = new FileReader()
 
             	reader.onload = (e) =>
@@ -77,5 +82,28 @@ class @SquareImage extends @Field
         # Open me!
         @template.changeImage.addEventListener "click", () =>
             @template.dialog.showModal()
+
+        # Close Me!
+        @template.save.addEventListener "click", () =>
+            # Save
+            canvas = document.createElement "canvas"
+            canvas.width = data.size
+            canvas.height = data.size
+
+            context = canvas.getContext "2d"
+            context.imageSmoothingEnabled = no
+            context.mozImageSmoothingEnabled = no
+
+            context.drawImage(
+                @template.rimg,
+                Math.round(@left),
+                Math.round(@top),
+                Math.round(@scaled_height),
+                Math.round(@scaled_width)
+            )
+
+            @template.value = canvas.toDataURL()
+
+            @template.dialog.close()
 
         return @
