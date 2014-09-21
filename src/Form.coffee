@@ -58,8 +58,7 @@ class @Form extends @WhatTheClass
 
 		# I control express routes!
 		return (req, res) =>
-			if !@action()
-				@action req.path
+			@action req.path
 
 			# Pre-method working
 			if req.body
