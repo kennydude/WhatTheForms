@@ -7,7 +7,7 @@ class @SquareImage extends @Field
         @scaled_width = ( @width * @template.zoom.value )
         @scaled_height = ( @height * @template.zoom.value )
 
-        @template.rimg.style.width = @scaled_width + "px";
+        @template.rimg.style.width = @scaled_width + "px"
         @template.rimg.style.height = @scaled_height + "px"
 
     go: (wrap, data) ->
@@ -51,6 +51,7 @@ class @SquareImage extends @Field
                 @orig = { x : e.clientX, y : e.clientY }
 
         # Load image
+        @template.file.value = ""
         @template.file.addEventListener "change", (e) =>
             file = @template.file.files[0]
             imageType = /image.*/
@@ -87,8 +88,8 @@ class @SquareImage extends @Field
         @template.save.addEventListener "click", () =>
             # Save
             canvas = document.createElement "canvas"
-            canvas.width = data.size
-            canvas.height = data.size
+            canvas.setAttribute "width", data.size + "px"
+            canvas.setAttribute "height", data.size + "px"
 
             context = canvas.getContext "2d"
             context.imageSmoothingEnabled = no
@@ -98,8 +99,8 @@ class @SquareImage extends @Field
                 @template.rimg,
                 Math.round(@left),
                 Math.round(@top),
-                Math.round(@scaled_height),
-                Math.round(@scaled_width)
+                Math.round(@scaled_width),
+                Math.round(@scaled_height)
             )
 
             @template.value = canvas.toDataURL()
