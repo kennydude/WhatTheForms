@@ -8,7 +8,7 @@ class FormRenderer
 
 # Included Classes
 
-ent = require("ent")
+he = require("he")
 fs = require("fs")
 path = require("path")
 
@@ -32,7 +32,7 @@ compileTemplate = (renderer, template_name, attrs) ->
 	return tpl
 
 renderTemplate = (renderer, template_name, data, attrs) ->
-	return compileTemplate(renderer, template_name, attrs).build()(ent, data)
+	return compileTemplate(renderer, template_name, attrs).build()(he, data)
 
 class BasicFormRenderer extends FormRenderer
 	scriptField : (vend, item) ->
@@ -77,7 +77,7 @@ var form = { "action" : "#{form.action()}" };
 		return @o
 
 	render: (form, result, req, res, attrs) ->
-		action = ent.encode form.action()
+		action = he.encode form.action()
 		o = []
 		fldId = 0
 
